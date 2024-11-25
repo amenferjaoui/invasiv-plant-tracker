@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: invasiv
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./db-script/db-script.sql:/docker-entrypoint-initdb.d/db-script.sql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  data:
