@@ -1,8 +1,15 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
-
 const app = express();
+
+const allowCors = (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader ("Access-Control-Allow-Headers", "*")
+  res.setHeader('Access-Control-Request-Method', '*');
+  res.setHeader("Access-Control-Allow-Methods","*") ;
+  next();
+}
+
+app.use(allowCors ); 
 const port = 3000;
 
 app.use(express.json({ limit: '10mb' }));
