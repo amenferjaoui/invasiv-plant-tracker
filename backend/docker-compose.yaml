@@ -1,6 +1,15 @@
 version: "3.9"
 
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend.dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src:/app/src
+
   db:
     image: postgres
     restart: always
