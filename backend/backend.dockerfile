@@ -8,5 +8,7 @@ RUN npm install .
 
 COPY . /app
 
-CMD npm start  
+RUN npm install -g nodemon
+
+CMD npm run dev  
 
