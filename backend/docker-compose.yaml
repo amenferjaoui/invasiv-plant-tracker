@@ -7,6 +7,8 @@ services:
       dockerfile: backend.dockerfile
     ports:
       - 3000:3000
+    environment:
+      - apiKey=JDKsobYQHsCPQRg0TutK7KY3QNc18EnIMJNNWEwVFoBVlgMat3
     volumes:
       - ./src:/app/src
 
