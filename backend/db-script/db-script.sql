@@ -72,3 +72,16 @@ INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES (
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Sporobolus indicus (L.) R.Br., 1810', 'Sporobole des Indes, Sporobole fertile, Sporobole tenace', 'Equisetopsida (Équisétopsides)', 'Poaceae (Poacées)');
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Symphyotrichum lanceolatum (Willd.) G.L.Nesom, 1995', 'Symphyotriche lancéolé, Aster lancéolé', 'Equisetopsida (Équisétopsides)', 'Asteraceae (Astéracées)');
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Womersleyella setacea (Hollenb.) R.E. Norris, 1992', 'Vomersleyelle sétacée', 'Florideophyceae', 'Rhodomelaceae');
+
+
+
+
+CREATE TABLE classification_results (
+    id SERIAL PRIMARY KEY, 
+    name TEXT NOT NULL,
+    probability FLOAT NOT NULL,
+    is_invasive BOOLEAN NOT NULL DEFAULT FALSE, 
+    latitude DECIMAL(10, 6) NOT NULL, 
+    longitude DECIMAL(10, 6) NOT NULL,
+    img_url TEXT NOT NULL
+);
