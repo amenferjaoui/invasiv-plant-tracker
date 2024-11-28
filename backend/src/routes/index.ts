@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { handelApiCall } from "../controller/controller.procces-image";
+import { handelApiCall, validateMatch } from "../controller/controller.procces-image";
 import { handelGetInvasiv } from "../controller/controller.getInvasivInfo";
 import Database from "../database/connect";
 
@@ -16,6 +16,7 @@ const upload = multer({
 
 router.post("/process-image", upload.single('image'), handelApiCall);
 router.get("/getInvasivPlants", handelGetInvasiv);
+router.post("/validate-match", validateMatch); // New endpoint for validating matches
 
 // New endpoint to serve stored images
 router.get("/api/images/:id", async (req, res) => {

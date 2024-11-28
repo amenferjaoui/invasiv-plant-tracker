@@ -5,6 +5,47 @@ import axios from "axios";
 
 type ApiErrorCode = 400 | 401 | 404 | 413 | 414 | 415 | 429 | 500;
 
+interface PlantNetImage {
+  url: {
+    o: string;
+    m: string;
+    s: string;
+  };
+  organ: string;
+  author: string;
+  license: string;
+  date: {
+    timestamp: number;
+    string: string;
+  };
+}
+
+interface PlantNetSpecies {
+  scientificNameWithoutAuthor: string;
+  scientificNameAuthorship: string;
+  genus: {
+    scientificName: string;
+  };
+  family: {
+    scientificName: string;
+  };
+  commonNames: string[];
+  scientificName: string;
+}
+
+interface PlantNetResult {
+  score: number;
+  species: PlantNetSpecies;
+  images: PlantNetImage[];
+}
+
+interface PlantNetResponse {
+  results: PlantNetResult[];
+  remainingIdentificationRequests: number;
+  version: string;
+  bestMatch?: string;
+}
+
 const API_ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   400: "Format de la requête invalide. Veuillez réessayer.",
   401: "Erreur d'authentification avec le service d'identification.",
@@ -38,7 +79,6 @@ export const handelApiCall = async (req: Request & { file?: any }, res: Response
     const latitude = Math.round(parseFloat(req.body.latitude) * 1000) / 1000;
     const longitude = Math.round(parseFloat(req.body.longitude) * 1000) / 1000;
 
-
     // Validate coordinates
     if (isNaN(latitude) || isNaN(longitude)) {
       res.status(400).json({
@@ -60,8 +100,8 @@ export const handelApiCall = async (req: Request & { file?: any }, res: Response
 
     console.log("Sending request to PlantNet...");
     try {
-      const response = await axios.post(
-        'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=fr&api-key=2b10JXfQ0h8ROmaX99KyJY7vu',
+      const response = await axios.post<PlantNetResponse>(
+        'https://my-api.plantnet.org/v2/identify/all?include-related-images=true&no-reject=false&nb-results=10&lang=fr&api-key=2b10JXfQ0h8ROmaX99KyJY7vu',
         formData,
         {
           headers: {
@@ -83,49 +123,28 @@ export const handelApiCall = async (req: Request & { file?: any }, res: Response
         return;
       }
 
-      const bestMatch = result.results[0];
-      const scientificName = bestMatch.species.scientificNameWithoutAuthor;
-      const probability = bestMatch.score;
+      // Transform the results to include only necessary information
+      const matches = result.results.map((match: PlantNetResult) => ({
+        score: match.score,
+        species: {
+          scientificName: match.species.scientificNameWithoutAuthor,
+          family: {
+            scientificName: match.species.family.scientificName
+          }
+        },
+        images: match.images.map((img: PlantNetImage) => ({
+          url: {
+            m: img.url.m
+          }
+        }))
+      }));
 
-      console.log("Getting database instance...");
-      const dbInstance = Database.getInstance();
-
-      console.log("Checking if plant is invasive...");
-      const invasiveCheck = await dbInstance.query(
-        "SELECT * FROM invasiv_plants WHERE reference_name LIKE $1",
-        [`%${scientificName}%`]
-      );
-
-      const isInvasive = invasiveCheck.length > 0;
-
-      console.log("Storing classification result with rounded coordinates:", { latitude, longitude });
-      const classificationResult = await dbInstance.query(
-        "INSERT INTO classification_results (name, probability, is_invasive, latitude, longitude, img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-        [scientificName, probability, isInvasive, latitude, longitude, '']
-      );
-
-      console.log("Storing image data...");
-      await dbInstance.query(
-        "INSERT INTO captured_images (image_data, classification_result_id) VALUES ($1, $2)",
-        [imageBuffer, classificationResult[0].id]
-      );
-
-      const imgUrl = `/api/images/${classificationResult[0].id}`;
-      console.log("Updating classification result with image URL:", imgUrl);
-      await dbInstance.query(
-        "UPDATE classification_results SET img_url = $1 WHERE id = $2",
-        [imgUrl, classificationResult[0].id]
-      );
-
-      console.log("Sending success response...");
+      console.log("Sending matches response...");
       res.json({
         status: 'identified',
-        name: scientificName,
-        probability: probability,
-        isInvasiv: isInvasive,
+        results: matches,
         latitude: latitude,
-        longitude: longitude,
-        imgUrl: imgUrl
+        longitude: longitude
       });
 
     } catch (apiError: any) {
@@ -157,5 +176,53 @@ export const handelApiCall = async (req: Request & { file?: any }, res: Response
     
     console.error("Sending error response:", errorResponse);
     res.status(500).json(errorResponse);
+  }
+};
+
+export const validateMatch = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { scientificName, latitude, longitude, imageUrl } = req.body;
+
+    if (!scientificName || !latitude || !longitude || !imageUrl) {
+      res.status(400).json({
+        status: 'error',
+        message: "Missing required information"
+      });
+      return;
+    }
+
+    const dbInstance = Database.getInstance();
+
+    // Check if plant is invasive
+    console.log("Checking if plant is invasive...");
+    const invasiveCheck = await dbInstance.query(
+      "SELECT * FROM invasiv_plants WHERE reference_name LIKE $1",
+      [`%${scientificName}%`]
+    );
+
+    const isInvasive = invasiveCheck.length > 0;
+
+    // Store the validated result
+    console.log("Storing classification result...");
+    const classificationResult = await dbInstance.query(
+      "INSERT INTO classification_results (name, probability, is_invasive, latitude, longitude, img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+      [scientificName, 1, isInvasive, latitude, longitude, imageUrl]
+    );
+
+    res.json({
+      status: 'success',
+      name: scientificName,
+      isInvasiv: isInvasive,
+      latitude: latitude,
+      longitude: longitude,
+      imgUrl: imageUrl
+    });
+
+  } catch (error) {
+    console.error("Error validating match:", error);
+    res.status(500).json({
+      status: 'error',
+      message: "Une erreur s'est produite lors de la validation"
+    });
   }
 };
