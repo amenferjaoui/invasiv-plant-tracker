@@ -8,7 +8,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - apiKey=JDKsobYQHsCPQRg0TutK7KY3QNc18EnIMJNNWEwVFoBVlgMat3
+      - PLANTNET_API_KEY=2b10JXfQ0h8ROmaX99KyJY7vu
     volumes:
       - ./src:/app/src
 
