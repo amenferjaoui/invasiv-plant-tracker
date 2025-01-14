@@ -81,7 +81,15 @@ CREATE TABLE classification_results (
     is_invasive BOOLEAN NOT NULL DEFAULT FALSE, 
     latitude DECIMAL(10, 6) NOT NULL, 
     longitude DECIMAL(10, 6) NOT NULL,
-    img_url TEXT NOT NULL
+    img_url TEXT NOT NULL,
+    family TEXT
+);
+
+-- Add family colors table for consistent color mapping
+CREATE TABLE family_colors (
+    id SERIAL PRIMARY KEY,
+    family TEXT UNIQUE NOT NULL,
+    color TEXT NOT NULL  -- Store hex color codes
 );
 
 -- Table for storing captured images
