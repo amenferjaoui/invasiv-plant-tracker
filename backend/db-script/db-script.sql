@@ -73,6 +73,7 @@ INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES (
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Symphyotrichum lanceolatum (Willd.) G.L.Nesom, 1995', 'Symphyotriche lancéolé, Aster lancéolé', 'Equisetopsida (Équisétopsides)', 'Asteraceae (Astéracées)');
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Womersleyella setacea (Hollenb.) R.E. Norris, 1992', 'Vomersleyelle sétacée', 'Florideophyceae', 'Rhodomelaceae');
 
+
 -- Table for storing classification results
 CREATE TABLE classification_results (
     id SERIAL PRIMARY KEY, 
@@ -82,14 +83,7 @@ CREATE TABLE classification_results (
     latitude DECIMAL(10, 6) NOT NULL, 
     longitude DECIMAL(10, 6) NOT NULL,
     img_url TEXT NOT NULL,
-    family TEXT
-);
-
--- Add family colors table for consistent color mapping
-CREATE TABLE family_colors (
-    id SERIAL PRIMARY KEY,
-    family TEXT UNIQUE NOT NULL,
-    color TEXT NOT NULL  -- Store hex color codes
+    family TEXT -- Added family column
 );
 
 -- Table for storing captured images
@@ -99,3 +93,5 @@ CREATE TABLE captured_images (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     classification_result_id INTEGER REFERENCES classification_results(id)
 );
+
+

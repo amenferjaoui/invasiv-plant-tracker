@@ -193,14 +193,15 @@ export const validateMatch = async (req: Request, res: Response): Promise<void> 
 
     const dbInstance = Database.getInstance();
 
-    // Check if plant is invasive
+    // Check if plant is invasive and get family
     console.log("Checking if plant is invasive...");
     const invasiveCheck = await dbInstance.query(
-      "SELECT * FROM invasiv_plants WHERE reference_name LIKE $1",
+      "SELECT family FROM invasiv_plants WHERE reference_name LIKE $1",
       [`%${scientificName}%`]
     );
 
     const isInvasive = invasiveCheck.length > 0;
+    const family = isInvasive ? invasiveCheck[0].family : null;
 
     // Get the family from invasiv_plants if it exists
     const familyQuery = await dbInstance.query(
@@ -222,7 +223,8 @@ export const validateMatch = async (req: Request, res: Response): Promise<void> 
       isInvasiv: isInvasive,
       latitude: latitude,
       longitude: longitude,
-      imgUrl: imageUrl
+      imgUrl: imageUrl,
+      family: family
     });
 
   } catch (error) {
