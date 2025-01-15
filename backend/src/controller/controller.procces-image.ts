@@ -202,11 +202,18 @@ export const validateMatch = async (req: Request, res: Response): Promise<void> 
 
     const isInvasive = invasiveCheck.length > 0;
 
+    // Get the family from invasiv_plants if it exists
+    const familyQuery = await dbInstance.query(
+      "SELECT family FROM invasiv_plants WHERE reference_name LIKE $1",
+      [`%${scientificName}%`]
+    );
+    const family = familyQuery.length > 0 ? familyQuery[0].family : 'Famille inconnue';
+
     // Store the validated result
     console.log("Storing classification result...");
     const classificationResult = await dbInstance.query(
-      "INSERT INTO classification_results (name, probability, is_invasive, latitude, longitude, img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-      [scientificName, 1, isInvasive, latitude, longitude, imageUrl]
+      "INSERT INTO classification_results (name, probability, is_invasive, latitude, longitude, img_url, family) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+      [scientificName, 1, isInvasive, latitude, longitude, imageUrl, family]
     );
 
     res.json({
