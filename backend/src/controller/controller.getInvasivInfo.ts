@@ -11,7 +11,8 @@ export const handelGetInvasiv = async (req: Request, res: Response) => {
         cr.is_invasive,
         cr.latitude,
         cr.longitude,
-        cr.img_url
+        cr.img_url,
+        cr.family
       FROM classification_results cr
       WHERE cr.is_invasive = true
       ORDER BY cr.probability DESC`
