@@ -5,23 +5,19 @@ export const handelGetInvasiv = async (req: Request, res: Response) => {
   try {
     const dbInstance = Database.getInstance();
     const data = await dbInstance.query(
-      `SELECT DISTINCT ON (cr.id)
+      `SELECT 
         cr.name,
         cr.probability,
         cr.is_invasive,
         cr.latitude,
         cr.longitude,
         cr.img_url,
-        COALESCE(ip.family, 'Famille inconnue') as family
+        cr.family
       FROM classification_results cr
-      LEFT JOIN invasiv_plants ip ON 
-        LOWER(cr.name) = LOWER(ip.reference_name)
-        OR LOWER(cr.name) = LOWER(ip.common_name)
-        OR (ip.common_name IS NOT NULL AND LOWER(ip.common_name) LIKE '%' || LOWER(cr.name) || '%')
-        OR (ip.reference_name IS NOT NULL AND LOWER(ip.reference_name) LIKE '%' || LOWER(cr.name) || '%')
       WHERE cr.is_invasive = true
-      ORDER BY cr.id, cr.probability DESC`
+      ORDER BY cr.probability DESC`
     );
+
     res.json(data);
   } catch (error) {
     console.error("Error fetching invasive plants:", error);
