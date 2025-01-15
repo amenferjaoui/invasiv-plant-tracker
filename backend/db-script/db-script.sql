@@ -73,6 +73,7 @@ INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES (
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Symphyotrichum lanceolatum (Willd.) G.L.Nesom, 1995', 'Symphyotriche lancéolé, Aster lancéolé', 'Equisetopsida (Équisétopsides)', 'Asteraceae (Astéracées)');
 INSERT INTO invasiv_plants (reference_name, common_name, class, family) VALUES ('Womersleyella setacea (Hollenb.) R.E. Norris, 1992', 'Vomersleyelle sétacée', 'Florideophyceae', 'Rhodomelaceae');
 
+
 -- Table for storing classification results
 CREATE TABLE classification_results (
     id SERIAL PRIMARY KEY, 
@@ -92,3 +93,5 @@ CREATE TABLE captured_images (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     classification_result_id INTEGER REFERENCES classification_results(id)
 );
+
+

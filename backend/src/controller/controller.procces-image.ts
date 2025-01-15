@@ -203,6 +203,13 @@ export const validateMatch = async (req: Request, res: Response): Promise<void> 
     const isInvasive = invasiveCheck.length > 0;
     const family = isInvasive ? invasiveCheck[0].family : null;
 
+    // Get the family from invasiv_plants if it exists
+    const familyQuery = await dbInstance.query(
+      "SELECT family FROM invasiv_plants WHERE reference_name LIKE $1",
+      [`%${scientificName}%`]
+    );
+    const family = familyQuery.length > 0 ? familyQuery[0].family : 'Famille inconnue';
+
     // Store the validated result
     console.log("Storing classification result...");
     const classificationResult = await dbInstance.query(

@@ -17,6 +17,7 @@ export const handelGetInvasiv = async (req: Request, res: Response) => {
       WHERE cr.is_invasive = true
       ORDER BY cr.probability DESC`
     );
+
     res.json(data);
   } catch (error) {
     console.error("Error fetching invasive plants:", error);
