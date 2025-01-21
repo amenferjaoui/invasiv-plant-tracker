@@ -47,14 +47,14 @@ interface PlantNetResponse {
 }
 
 const API_ERROR_MESSAGES: Record<ApiErrorCode, string> = {
-  400: "Format de la requête invalide. Veuillez réessayer.",
-  401: "Erreur d'authentification avec le service d'identification.",
-  404: "La plante n'a pas pu être identifiée. Essayez de prendre une photo plus nette ou sous un angle différent.",
-  413: "L'image est trop volumineuse. Veuillez prendre une photo avec une résolution plus faible.",
-  414: "L'URL de la requête est trop longue.",
-  415: "Le format de l'image n'est pas supporté. Veuillez utiliser une image JPEG.",
-  429: "Trop de requêtes envoyées. Veuillez attendre quelques minutes avant de réessayer.",
-  500: "Le service d'identification est temporairement indisponible. Veuillez réessayer plus tard."
+  400: "Invalid request format. Please try again.",
+  401: "Authentication error with the identification service.",
+  404: "The plant could not be identified. Try taking a clearer photo or from a different angle.",
+  413: "The image is too large. Please take a photo with a lower resolution.",
+  414: "The request URL is too long.",
+  415: "The image format is not supported. Please use a JPEG image.",
+  429: "Too many requests sent. Please wait a few minutes before trying again.",
+  500: "The identification service is temporarily unavailable. Please try again later."
 };
 
 export const handelApiCall = async (req: Request & { file?: any }, res: Response): Promise<void> => {
