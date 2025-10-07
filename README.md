@@ -73,7 +73,7 @@ Empower environmental professionals and citizen scientists to:
 *Upload existing photos with automatic EXIF data extraction*
 
 ### 🗺️ Interactive Map View
-<img src="screens/mapping_view.png" alt="Map View" width="800"/>
+<img src="screens/mapping_view.png" alt="Map View" width="300"/>
 
 *Comprehensive mapping interface with family-based color coding and legend*
 
